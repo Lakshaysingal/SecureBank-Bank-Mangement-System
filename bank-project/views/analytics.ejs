@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <%- include('partials/navbar', { user }) %>
+    
+    <div class="analytics-page">
+        <h2>Expense Analytics</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Deposits</h3>
+                <p class="stat-value credit">₹<%= user.transactions.filter(t => t.type === 'deposit').reduce((sum, t) => sum + t.amount, 0).toFixed(2) %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Withdrawals</h3>
+                <p class="stat-value debit">₹<%= user.transactions.filter(t => t.type === 'withdraw').reduce((sum, t) => sum + t.amount, 0).toFixed(2) %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Transfers</h3>
+                <p class="stat-value debit">₹<%= user.transactions.filter(t => t.type === 'transfer').reduce((sum, t) => sum + t.amount, 0).toFixed(2) %></p>
+            </div>
+            <div class="stat-card">
+                <h3>Bill Payments</h3>
+                <p class="stat-value debit">₹<%= user.transactions.filter(t => t.type === 'bill_payment').reduce((sum, t) => sum + t.amount, 0).toFixed(2) %></p>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container-small">
+                <canvas id="expenseChart"></canvas>
+            </div>
+
+            <div class="chart-container-small">
+                <canvas id="transactionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const transactions = <%- JSON.stringify(user.transactions) %>;
+        
+        // Expense breakdown
+        const expenseData = {
+            withdraw: transactions.filter(t => t.type === 'withdraw').reduce((sum, t) => sum + t.amount, 0),
+            transfer: transactions.filter(t => t.type === 'transfer').reduce((sum, t) => sum + t.amount, 0),
+            bill_payment: transactions.filter(t => t.type === 'bill_payment').reduce((sum, t) => sum + t.amount, 0),
+            loan: transactions.filter(t => t.type === 'loan').reduce((sum, t) => sum + t.amount, 0)
+        };
+
+        new Chart(document.getElementById('expenseChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Withdrawals', 'Transfers', 'Bill Payments', 'Loans'],
+                datasets: [{
+                    data: [expenseData.withdraw, expenseData.transfer, expenseData.bill_payment, expenseData.loan],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    title: { display: true, text: 'Expense Breakdown', font: { size: 16 } }
+                }
+            }
+        });
+
+        // Transaction timeline
+        const last7Days = transactions.slice(-7).map(t => ({
+            date: new Date(t.date).toLocaleDateString(),
+            amount: t.amount
+        }));
+
+        new Chart(document.getElementById('transactionChart'), {
+            type: 'line',
+            data: {
+                labels: last7Days.map(d => d.date),
+                datasets: [{
+                    label: 'Transaction Amount',
+                    data: last7Days.map(d => d.amount),
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    title: { display: true, text: 'Recent Transaction Trend', font: { size: 16 } }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

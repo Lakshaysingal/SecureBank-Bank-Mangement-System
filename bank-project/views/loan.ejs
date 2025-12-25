@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply for Loan - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user }) %>
+    
+    <div class="form-container">
+        <div class="form-card">
+            <h2>💳 Apply for Loan</h2>
+            <p class="info-text">Interest Rate: 8.5% per annum</p>
+            <form action="/bank/loan" method="POST" id="loanForm">
+                <div class="form-group">
+                    <label>Loan Amount (₹)</label>
+                    <input type="number" name="amount" id="loanAmount" min="10000" max="1000000" required>
+                </div>
+                <div class="form-group">
+                    <label>Tenure (Months)</label>
+                    <select name="tenure" id="tenure" required>
+                        <option value="12">12 Months</option>
+                        <option value="24">24 Months</option>
+                        <option value="36">36 Months</option>
+                        <option value="48">48 Months</option>
+                        <option value="60">60 Months</option>
+                    </select>
+                </div>
+                <div class="emi-preview" id="emiPreview"></div>
+                <button type="submit" class="btn-primary">Apply</button>
+                <a href="/bank/dashboard" class="btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+    <script src="/js/loan.js"></script>
+</body>
+</html>

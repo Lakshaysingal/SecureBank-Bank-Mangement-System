@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user }) %>
+    
+    <div class="transactions-page">
+        <div class="page-header">
+            <h2>Transaction History</h2>
+            <button class="btn-primary" onclick="showDownloadModal()">📥 Download Statement</button>
+        </div>
+
+        <div class="transaction-table">
+            <% if (user.transactions.length > 0) { %>
+                <% user.transactions.slice().reverse().forEach(transaction => { %>
+                    <div class="transaction-row">
+                        <div class="transaction-date">
+                            <%= new Date(transaction.date).toLocaleDateString() %>
+                            <small><%= new Date(transaction.date).toLocaleTimeString() %></small>
+                        </div>
+                        <div class="transaction-type">
+                            <strong><%= transaction.type.replace('_', ' ').toUpperCase() %></strong>
+                            <small><%= transaction.description %></small>
+                        </div>
+                        <div class="transaction-amount <%= ['deposit', 'loan', 'received'].includes(transaction.type) ? 'credit' : 'debit' %>">
+                            <%= ['deposit', 'loan', 'received'].includes(transaction.type) ? '+' : '-' %>₹<%= transaction.amount.toFixed(2) %>
+                        </div>
+                        <div class="transaction-balance">
+                            Balance: ₹<%= transaction.balance.toFixed(2) %>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p class="no-data">No transactions found</p>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Download Modal -->
+    <div id="downloadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDownloadModal()">&times;</span>
+            <h3>Download Statement</h3>
+            <form action="/bank/statement/download" method="GET">
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" name="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="date" name="endDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Format</label>
+                    <select name="format" required>
+                        <option value="pdf">PDF (Recommended)</option>
+                        <option value="txt">Text File</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary full-width">Download</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/statement.js"></script>
+</body>
+</html>

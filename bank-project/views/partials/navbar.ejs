@@ -1,0 +1,89 @@
+<nav class="navbar dashboard-nav">
+    <div class="container">
+        <div class="logo">💎 SecureBank</div>
+        <div class="nav-menu">
+            <a href="/bank/dashboard">Dashboard</a>
+            <a href="/bank/transactions">Transactions</a>
+            <a href="/bank/analytics">Analytics</a>
+            <a href="/bank/cards">Cards</a>
+            <a href="/bank/notifications">
+                🔔
+                <% if (user.notifications && user.notifications.filter(n => !n.isRead).length > 0) { %>
+                    <span class="notification-badge"><%= user.notifications.filter(n => !n.isRead).length %></span>
+                <% } %>
+            </a>
+            <div class="dropdown">
+                <button class="dropdown-btn">
+                    <span class="user-info">👤 <%= user.fullName.split(' ')[0] %></span>
+                </button>
+                <div class="dropdown-content">
+                    <a href="/bank/profile">My Profile</a>
+                    <a href="/bank/security">Security</a>
+                    <a href="/bank/support">Support</a>
+                    <a href="/auth/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<style>
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ef4444;
+        color: white;
+        border-radius: 50%;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    .dropdown-btn {
+        background: none;
+        border: none;
+        color: #333;
+        padding: 0.6rem 1rem;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    .dropdown-btn:hover {
+        background: #f3f4f6;
+    }
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: white;
+        min-width: 200px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        border-radius: 10px;
+        z-index: 1000;
+        margin-top: 0.5rem;
+    }
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+    .dropdown-content a {
+        display: block;
+        padding: 1rem 1.5rem;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .dropdown-content a:first-child {
+        border-radius: 10px 10px 0 0;
+    }
+    .dropdown-content a:last-child {
+        border-radius: 0 0 10px 10px;
+    }
+    .dropdown-content a:hover {
+        background: #f3f4f6;
+        color: #667eea;
+    }
+</style>

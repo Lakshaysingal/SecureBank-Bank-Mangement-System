@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Deposit - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user }) %>
+    
+    <div class="form-container">
+        <div class="form-card">
+            <h2>📈 Create Fixed Deposit</h2>
+            <p class="balance-info">Available Balance: ₹<%= user.balance.toFixed(2) %></p>
+            <p class="info-text">Interest Rate: 7.5% per annum</p>
+            <% if (typeof error !== 'undefined') { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <form action="/bank/fixed-deposit" method="POST" id="fdForm">
+                <div class="form-group">
+                    <label>Deposit Amount (₹)</label>
+                    <input type="number" name="amount" id="fdAmount" min="5000" max="<%= user.balance %>" required>
+                </div>
+                <div class="form-group">
+                    <label>Tenure (Years)</label>
+                    <select name="tenure" id="fdTenure" required>
+                        <option value="1">1 Year</option>
+                        <option value="2">2 Years</option>
+                        <option value="3">3 Years</option>
+                        <option value="5">5 Years</option>
+                    </select>
+                </div>
+                <div class="maturity-preview" id="maturityPreview"></div>
+                <button type="submit" class="btn-primary">Create FD</button>
+                <a href="/bank/dashboard" class="btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+    <script src="/js/fd.js"></script>
+</body>
+</html>

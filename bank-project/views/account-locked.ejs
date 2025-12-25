@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Locked - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .locked-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .locked-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .locked-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+        .locked-title {
+            color: #ef4444;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .locked-message {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="locked-container">
+        <div class="locked-card">
+            <div class="locked-icon">🔒</div>
+            <h2 class="locked-title">Account Locked</h2>
+            <p class="locked-message">
+                Your account has been temporarily locked for security reasons. 
+                This may be due to multiple failed login attempts or suspicious activity.
+            </p>
+            <p class="locked-message">
+                Please contact our support team to unlock your account:
+            </p>
+            <div style="margin: 2rem 0;">
+                <p><strong>📞 Phone:</strong> +91-1800-XXX-XXXX</p>
+                <p><strong>✉️ Email:</strong> support@securebank.com</p>
+            </div>
+            <a href="/auth/logout" class="btn-primary">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

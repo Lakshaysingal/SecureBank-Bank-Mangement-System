@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <h2>👤 My Profile</h2>
+        
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <%= user.fullName.charAt(0).toUpperCase() %>
+                    </div>
+                    <h3><%= user.fullName %></h3>
+                    <p class="account-number"><%= user.accountNumber %></p>
+                </div>
+
+                <div class="profile-details">
+                    <div class="detail-section">
+                        <h4>Personal Information</h4>
+                        <div class="detail-row">
+                            <span>Email:</span>
+                            <strong><%= user.email %></strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Phone:</span>
+                            <strong><%= user.phone || 'Not provided' %></strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Address:</span>
+                            <strong><%= user.address || 'Not provided' %></strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Date of Birth:</span>
+                            <strong><%= user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : 'Not provided' %></strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Gender:</span>
+                            <strong><%= user.gender || 'Not provided' %></strong>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h4>Account Information</h4>
+                        <div class="detail-row">
+                            <span>Account Type:</span>
+                            <strong><%= user.accountType || 'Savings' %></strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>KYC Status:</span>
+                            <strong><%= user.kycStatus || 'Pending' %></strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Member Since:</span>
+                            <strong><%= new Date(user.createdAt).toLocaleDateString() %></strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Last Login:</span>
+                            <strong><%= user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'N/A' %></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="showEditModal()">Edit Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h3>Edit Profile</h3>
+            <form action="/bank/profile/update" method="POST">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" value="<%= user.phone || '' %>">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea name="address" rows="3"><%= user.address || '' %></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dateOfBirth" value="<%= user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '' %>">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="">Select</option>
+                        <option value="Male" <%= user.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                        <option value="Female" <%= user.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                        <option value="Other" <%= user.gender === 'Other' ? 'selected' : '' %>>Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary full-width">Update Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showEditModal() {
+            document.getElementById('editModal').style.display = 'block';
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) modal.style.display = 'none';
+        }
+    </script>
+
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .profile-header {
+            text-align: center;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+        .profile-details {
+            margin: 2rem 0;
+        }
+        .detail-section {
+            margin: 2rem 0;
+        }
+        .detail-section h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+    </style>
+</body>
+</html>

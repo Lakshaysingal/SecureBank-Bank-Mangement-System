@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer to Beneficiary - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="form-container">
+        <div class="form-card">
+            <h2>🔄 Transfer to <%= beneficiary.name %></h2>
+            
+            <div class="beneficiary-info">
+                <p><strong>Account Number:</strong> <%= beneficiary.accountNumber %></p>
+                <p><strong>Bank:</strong> <%= beneficiary.bankName || 'N/A' %></p>
+                <% if (beneficiary.nickname) { %>
+                    <p><strong>Nickname:</strong> <%= beneficiary.nickname %></p>
+                <% } %>
+            </div>
+
+            <p class="balance-info">Available Balance: ₹<%= user.balance.toFixed(2) %></p>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            
+            <form action="/bank/transfer/beneficiary/<%= beneficiary._id %>" method="POST">
+                <div class="form-group">
+                    <label>Amount (₹)</label>
+                    <input type="number" name="amount" step="0.01" min="1" max="<%= user.balance %>" required autofocus>
+                </div>
+                <button type="submit" class="btn-primary">Transfer Money</button>
+                <a href="/bank/beneficiaries" class="btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .beneficiary-info {
+            background: #f0f9ff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+        .beneficiary-info p {
+            margin: 0.5rem 0;
+            color: #333;
+        }
+    </style>
+</body>
+</html>

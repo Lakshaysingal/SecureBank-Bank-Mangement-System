@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investments - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h2>📈 My Investments</h2>
+            <button class="btn-primary" onclick="showInvestModal()">+ New Investment</button>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+
+        <!-- Portfolio Summary -->
+        <div class="portfolio-summary">
+            <%
+                const totalInvested = user.investments.filter(i => i.status === 'active').reduce((sum, i) => sum + i.amount, 0);
+                const currentValue = user.investments.filter(i => i.status === 'active').reduce((sum, i) => sum + i.currentValue, 0);
+                const totalProfit = currentValue - totalInvested;
+                const profitPercentage = totalInvested > 0 ? (totalProfit / totalInvested * 100) : 0;
+            %>
+            <div class="summary-card">
+                <h3>Total Invested</h3>
+                <p class="amount">₹<%= totalInvested.toFixed(2) %></p>
+            </div>
+            <div class="summary-card">
+                <h3>Current Value</h3>
+                <p class="amount credit">₹<%= currentValue.toFixed(2) %></p>
+            </div>
+            <div class="summary-card">
+                <h3>Profit/Loss</h3>
+                <p class="amount <%= totalProfit >= 0 ? 'credit' : 'debit' %>">
+                    <%= totalProfit >= 0 ? '+' : '' %>₹<%= totalProfit.toFixed(2) %>
+                    (<%= profitPercentage.toFixed(2) %>%)
+                </p>
+            </div>
+        </div>
+
+        <!-- Investment List -->
+        <div class="investments-grid">
+            <% if (user.investments && user.investments.length > 0) { %>
+                <% user.investments.filter(i => i.status === 'active').forEach(inv => { %>
+                    <div class="investment-card">
+                        <div class="investment-type <%= inv.type %>">
+                            <%= inv.type === 'mutual_fund' ? '📊' : inv.type === 'gold' ? '🥇' : '💰' %>
+                            <%= inv.type.replace('_', ' ').toUpperCase() %>
+                        </div>
+                        <h4><%= inv.name %></h4>
+                        <div class="investment-details">
+                            <div class="detail-row">
+                                <span>Invested:</span>
+                                <strong>₹<%= inv.amount.toFixed(2) %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Current Value:</span>
+                                <strong class="credit">₹<%= inv.currentValue.toFixed(2) %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Units:</span>
+                                <strong><%= inv.units %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Purchase Date:</span>
+                                <strong><%= new Date(inv.purchaseDate).toLocaleDateString() %></strong>
+                            </div>
+                            <%
+                                const profit = inv.currentValue - inv.amount;
+                                const profitPercent = (profit / inv.amount * 100);
+                            %>
+                            <div class="detail-row profit">
+                                <span>Profit/Loss:</span>
+                                <strong class="<%= profit >= 0 ? 'credit' : 'debit' %>">
+                                    <%= profit >= 0 ? '+' : '' %>₹<%= profit.toFixed(2) %>
+                                    (<%= profitPercent.toFixed(2) %>%)
+                                </strong>
+                            </div>
+                        </div>
+                        <form action="/bank/investments/sell/<%= inv._id %>" method="POST">
+                            <button type="submit" class="btn-primary full-width" onclick="return confirm('Are you sure you want to sell this investment?')">
+                                Sell Investment
+                            </button>
+                        </form>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-data">
+                    <p>📈 Start investing today!</p>
+                    <button class="btn-primary" onclick="showInvestModal()">Make Your First Investment</button>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Invest Modal -->
+    <div id="investModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeInvestModal()">&times;</span>
+            <h3>New Investment</h3>
+            <form action="/bank/investments/buy" method="POST">
+                <div class="form-group">
+                    <label>Investment Type</label>
+                    <select name="type" id="investType" required>
+                        <option value="mutual_fund">📊 Mutual Fund</option>
+                        <option value="gold">🥇 Digital Gold</option>
+                        <option value="sip">💰 SIP</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Investment Name</label>
+                    <input type="text" name="name" placeholder="e.g., HDFC Equity Fund" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount to Invest (₹)</label>
+                    <input type="number" name="amount" min="500" step="100" required>
+                </div>
+                <div class="form-group">
+                    <label>Units/Quantity</label>
+                    <input type="number" name="units" step="0.01" value="1" required>
+                </div>
+                <p class="info-text">Available Balance: ₹<%= user.balance.toFixed(2) %></p>
+                <button type="submit" class="btn-primary full-width">Invest Now</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showInvestModal() {
+            document.getElementById('investModal').style.display = 'block';
+        }
+        function closeInvestModal() {
+            document.getElementById('investModal').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('investModal');
+            if (event.target == modal) modal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

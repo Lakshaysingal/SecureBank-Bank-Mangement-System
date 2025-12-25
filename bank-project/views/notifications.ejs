@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h2>🔔 Notifications</h2>
+            <form action="/bank/notifications/mark-all-read" method="POST" style="display: inline;">
+                <button type="submit" class="btn-secondary">Mark All as Read</button>
+            </form>
+        </div>
+
+        <div class="notifications-list">
+            <% if (user.notifications && user.notifications.length > 0) { %>
+                <% user.notifications.slice().reverse().forEach(notif => { %>
+                    <div class="notification-item <%= notif.isRead ? 'read' : 'unread' %>">
+                        <div class="notif-icon <%= notif.type %>">
+                            <%= notif.type === 'transaction' ? '💰' : notif.type === 'alert' ? '⚠️' : notif.type === 'security' ? '🔒' : 'ℹ️' %>
+                        </div>
+                        <div class="notif-content">
+                            <h4><%= notif.title %></h4>
+                            <p><%= notif.message %></p>
+                            <small><%= new Date(notif.date).toLocaleString() %></small>
+                        </div>
+                        <% if (!notif.isRead) { %>
+                            <form action="/bank/notifications/mark-read/<%= notif._id %>" method="POST">
+                                <button type="submit" class="btn-mark-read">✓</button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-data">
+                    <p>🔔 No notifications yet</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <%- include('partials/admin-navbar') %>
+    
+    <div class="admin-container">
+        <h1>User Details</h1>
+        
+        <div class="user-details-card">
+            <div class="user-header">
+                <h2><%= user.fullName %></h2>
+                <% if (user.accountLocked) { %>
+                    <form action="/admin/users/<%= user._id %>/unlock" method="POST" style="display: inline;">
+                        <button type="submit" class="btn-primary">Unlock Account</button>
+                    </form>
+                <% } else { %>
+                    <form action="/admin/users/<%= user._id %>/lock" method="POST" style="display: inline;">
+                        <button type="submit" class="btn-danger">Lock Account</button>
+                    </form>
+                <% } %>
+            </div>
+            
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Email:</label>
+                    <span><%= user.email %></span>
+                </div>
+                <div class="detail-item">
+                    <label>Account Number:</label>
+                    <span><%= user.accountNumber %></span>
+                </div>
+                <div class="detail-item">
+                    <label>Balance:</label>
+                    <span>₹<%= user.balance.toFixed(2) %></span>
+                </div>
+                <div class="detail-item">
+                    <label>Phone:</label>
+                    <span><%= user.phone || 'N/A' %></span>
+                </div>
+                <div class="detail-item">
+                    <label>Joined:</label>
+                    <span><%= new Date(user.createdAt).toLocaleDateString() %></span>
+                </div>
+                <div class="detail-item">
+                    <label>Status:</label>
+                    <span>
+                        <% if (user.accountLocked) { %>
+                            <span class="badge badge-danger">🔒 Locked</span>
+                        <% } else { %>
+                            <span class="badge badge-success">✅ Active</span>
+                        <% } %>
+                    </span>
+                </div>
+            </div>
+
+            <h3>Recent Transactions</h3>
+            <div class="transaction-list">
+                <% if (user.transactions && user.transactions.length > 0) { %>
+                    <% user.transactions.slice(-10).reverse().forEach(trans => { %>
+                        <div class="transaction-item">
+                            <div>
+                                <strong><%= trans.type.toUpperCase() %></strong>
+                                <small><%= trans.description %></small>
+                            </div>
+                            <div>
+                                <span class="<%= ['deposit', 'loan', 'received'].includes(trans.type) ? 'credit' : 'debit' %>">
+                                    <%= ['deposit', 'loan', 'received'].includes(trans.type) ? '+' : '-' %>₹<%= trans.amount.toFixed(2) %>
+                                </span>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No transactions yet.</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

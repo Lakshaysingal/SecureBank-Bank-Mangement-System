@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Admin</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <%- include('partials/admin-navbar') %>
+    
+    <div class="admin-container">
+        <h1>👥 User Management</h1>
+        
+        <div class="admin-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Account Number</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user => { %>
+                        <tr>
+                            <td><%= user.fullName %></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.accountNumber %></td>
+                            <td>₹<%= user.balance.toFixed(2) %></td>
+                            <td>
+                                <% if (user.accountLocked) { %>
+                                    <span class="badge badge-danger">🔒 Locked</span>
+                                <% } else { %>
+                                    <span class="badge badge-success">✅ Active</span>
+                                <% } %>
+                            </td>
+                            <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+                            <td>
+                                <a href="/admin/users/<%= user._id %>" class="btn-view">View Details</a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

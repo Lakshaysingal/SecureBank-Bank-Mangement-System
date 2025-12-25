@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .admin-login {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .admin-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            width: 100%;
+            max-width: 450px;
+        }
+        .admin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .admin-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .admin-title {
+            color: #1e3a8a;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="admin-login">
+    <div class="admin-card">
+        <div class="admin-header">
+            <div class="admin-icon">👨‍💼</div>
+            <h2 class="admin-title">Admin Panel</h2>
+            <p style="color: #666;">SecureBank Management System</p>
+        </div>
+
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+
+        <form action="/admin/login" method="POST">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required placeholder="Enter admin username" autofocus>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="Enter admin password">
+            </div>
+            <button type="submit" class="btn-primary full-width">Login to Admin Panel</button>
+        </form>
+
+        <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; text-align: center;">
+            <p style="color: #666; font-size: 0.9rem;">Default Credentials:</p>
+            <p style="color: #999; font-size: 0.85rem;">Username: <strong>admin</strong> | Password: <strong>admin123</strong></p>
+            <a href="/" style="color: #667eea; text-decoration: none; font-size: 0.9rem;">← Back to Main Site</a>
+        </div>
+    </div>
+</body>
+</html>

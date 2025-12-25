@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recurring Deposit - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h2>📊 Recurring Deposits</h2>
+            <button class="btn-primary" onclick="showCreateModal()">+ Create New RD</button>
+        </div>
+
+        <div class="rd-list">
+            <% if (user.recurringDeposits && user.recurringDeposits.length > 0) { %>
+                <% user.recurringDeposits.forEach(rd => { %>
+                    <div class="rd-card <%= rd.status %>">
+                        <div class="rd-header">
+                            <h3>Recurring Deposit</h3>
+                            <span class="status-badge <%= rd.status %>"><%= rd.status.toUpperCase() %></span>
+                        </div>
+                        <div class="rd-details">
+                            <div class="detail-row">
+                                <span>Monthly Deposit:</span>
+                                <strong>₹<%= rd.monthlyDeposit.toFixed(2) %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Tenure:</span>
+                                <strong><%= rd.tenure %> Months</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Interest Rate:</span>
+                                <strong><%= rd.interestRate %>% p.a.</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Maturity Amount:</span>
+                                <strong class="credit">₹<%= rd.maturityAmount %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Maturity Date:</span>
+                                <strong><%= new Date(rd.maturityDate).toLocaleDateString() %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Installments Paid:</span>
+                                <strong><%= rd.deposits.length %> / <%= rd.tenure %></strong>
+                            </div>
+                        </div>
+                        <% if (rd.status === 'active' && rd.deposits.length < rd.tenure) { %>
+                            <form action="/bank/recurring-deposit/pay/<%= rd._id %>" method="POST">
+                                <button type="submit" class="btn-primary full-width">Pay Next Installment</button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-data">
+                    <p>📊 No recurring deposits yet</p>
+                    <button class="btn-primary" onclick="showCreateModal()">Start Your First RD</button>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Create RD Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCreateModal()">&times;</span>
+            <h3>Create Recurring Deposit</h3>
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            <form action="/bank/recurring-deposit/create" method="POST" id="rdForm">
+                <div class="form-group">
+                    <label>Monthly Deposit Amount (₹)</label>
+                    <input type="number" name="monthlyDeposit" id="rdAmount" min="500" step="100" required>
+                </div>
+                <div class="form-group">
+                    <label>Tenure (Months)</label>
+                    <select name="tenure" id="rdTenure" required>
+                        <option value="6">6 Months</option>
+                        <option value="12">12 Months</option>
+                        <option value="24">24 Months</option>
+                        <option value="36">36 Months</option>
+                        <option value="60">60 Months</option>
+                    </select>
+                </div>
+                <div class="maturity-preview" id="rdPreview"></div>
+                <p class="info-text">Interest Rate: 7% per annum</p>
+                <button type="submit" class="btn-primary full-width">Create RD</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showCreateModal() {
+            document.getElementById('createModal').style.display = 'block';
+        }
+        function closeCreateModal() {
+            document.getElementById('createModal').style.display = 'none';
+        }
+        
+        document.getElementById('rdAmount').addEventListener('input', calculateRD);
+        document.getElementById('rdTenure').addEventListener('change', calculateRD);
+        
+        function calculateRD() {
+            const monthly = parseFloat(document.getElementById('rdAmount').value);
+            const tenure = parseInt(document.getElementById('rdTenure').value);
+            
+            if (monthly && tenure) {
+                const rate = 7 / 400;
+                const quarters = tenure * 4 / 12;
+                const maturity = monthly * tenure * (Math.pow(1 + rate, quarters) - 1) / (1 - Math.pow(1 + rate, -1/3));
+                const totalDeposit = monthly * tenure;
+                const interest = maturity - totalDeposit;
+                
+                document.getElementById('rdPreview').innerHTML = `
+                    <p><strong>Total Deposits:</strong> ₹${totalDeposit.toFixed(2)}</p>
+                    <p><strong>Interest Earned:</strong> ₹${interest.toFixed(2)}</p>
+                    <p><strong>Maturity Amount:</strong> ₹${maturity.toFixed(2)}</p>
+                `;
+            }
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('createModal');
+            if (event.target == modal) modal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

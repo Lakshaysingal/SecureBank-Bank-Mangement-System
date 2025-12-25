@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beneficiaries - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h2>👥 Manage Beneficiaries</h2>
+            <button class="btn-primary" onclick="showAddModal()">+ Add Beneficiary</button>
+        </div>
+
+        <div class="beneficiaries-grid">
+            <% if (user.beneficiaries && user.beneficiaries.length > 0) { %>
+                <% user.beneficiaries.forEach(ben => { %>
+                    <div class="beneficiary-card">
+                        <div class="beneficiary-icon">👤</div>
+                        <h3><%= ben.name %></h3>
+                        <p class="beneficiary-nickname"><%= ben.nickname || 'No nickname' %></p>
+                        <p class="beneficiary-account"><%= ben.accountNumber %></p>
+                        <p class="beneficiary-bank"><%= ben.bankName || 'N/A' %></p>
+                        <div class="beneficiary-actions">
+                            <a href="/bank/transfer/beneficiary/<%= ben._id %>" class="btn-primary">Transfer</a>
+                            <form action="/bank/beneficiaries/delete/<%= ben._id %>" method="POST" style="display: inline;">
+                                <button type="submit" class="btn-secondary" onclick="return confirm('Delete this beneficiary?')">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-data">
+                    <p>No beneficiaries added yet</p>
+                    <button class="btn-primary" onclick="showAddModal()">Add Your First Beneficiary</button>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Add Beneficiary Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddModal()">&times;</span>
+            <h3>Add New Beneficiary</h3>
+            <form action="/bank/beneficiaries/add" method="POST">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Account Number *</label>
+                    <input type="text" name="accountNumber" required>
+                </div>
+                <div class="form-group">
+                    <label>Bank Name</label>
+                    <input type="text" name="bankName">
+                </div>
+                <div class="form-group">
+                    <label>IFSC Code</label>
+                    <input type="text" name="ifscCode">
+                </div>
+                <div class="form-group">
+                    <label>Nickname</label>
+                    <input type="text" name="nickname" placeholder="e.g., Mom, Dad, Friend">
+                </div>
+                <button type="submit" class="btn-primary full-width">Add Beneficiary</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showAddModal() {
+            document.getElementById('addModal').style.display = 'block';
+        }
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('addModal');
+            if (event.target == modal) modal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

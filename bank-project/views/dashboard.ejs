@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user }) %>
+    
+    <div class="dashboard-container">
+        <div class="balance-card">
+            <h2>Account Balance</h2>
+            <div class="balance">₹<%= user.balance.toFixed(2) %></div>
+            <p>Account: <%= user.accountNumber %></p>
+        </div>
+
+        <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="action-grid">
+                <a href="/bank/deposit" class="action-btn">
+                    <span class="icon">💰</span>
+                    <span>Deposit</span>
+                </a>
+                <a href="/bank/withdraw" class="action-btn">
+                    <span class="icon">💸</span>
+                    <span>Withdraw</span>
+                </a>
+                <a href="/bank/transfer" class="action-btn">
+                    <span class="icon">🔄</span>
+                    <span>Transfer</span>
+                </a>
+                <a href="/bank/beneficiaries" class="action-btn">
+                    <span class="icon">👥</span>
+                    <span>Beneficiaries</span>
+                </a>
+                <a href="/bank/loan" class="action-btn">
+                    <span class="icon">💳</span>
+                    <span>Loan</span>
+                </a>
+                <a href="/bank/fixed-deposit" class="action-btn">
+                    <span class="icon">📈</span>
+                    <span>Fixed Deposit</span>
+                </a>
+                <a href="/bank/recurring-deposit" class="action-btn">
+                    <span class="icon">📊</span>
+                    <span>RD</span>
+                </a>
+                <a href="/bank/bill-payment" class="action-btn">
+                    <span class="icon">📱</span>
+                    <span>Bill Payment</span>
+                </a>
+                <a href="/bank/cards" class="action-btn">
+                    <span class="icon">💳</span>
+                    <span>My Cards</span>
+                </a>
+                <a href="/bank/investments" class="action-btn">
+                    <span class="icon">📈</span>
+                    <span>Investments</span>
+                </a>
+                <a href="/bank/budget" class="action-btn">
+                    <span class="icon">💰</span>
+                    <span>Budget</span>
+                </a>
+                <a href="/bank/qr-pay" class="action-btn">
+                    <span class="icon">📱</span>
+                    <span>QR Pay</span>
+                </a>
+                <a href="/bank/analytics" class="action-btn">
+                    <span class="icon">📊</span>
+                    <span>Analytics</span>
+                </a>
+                <a href="/bank/transactions" class="action-btn">
+                    <span class="icon">📝</span>
+                    <span>Transactions</span>
+                </a>
+                <a href="/bank/referral" class="action-btn">
+                    <span class="icon">🎁</span>
+                    <span>Referral</span>
+                </a>
+                <a href="/bank/support" class="action-btn">
+                    <span class="icon">💬</span>
+                    <span>Support</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="recent-transactions">
+            <h3>Recent Transactions</h3>
+            <div class="transaction-list">
+                <% if (user.transactions.length > 0) { %>
+                    <% user.transactions.slice(-5).reverse().forEach(transaction => { %>
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <strong><%= transaction.type.toUpperCase() %></strong>
+                                <small><%= transaction.description %></small>
+                            </div>
+                            <div class="transaction-amount <%= transaction.type === 'deposit' || transaction.type === 'loan' || transaction.type === 'received' ? 'credit' : 'debit' %>">
+                                <%= transaction.type === 'deposit' || transaction.type === 'loan' || transaction.type === 'received' ? '+' : '-' %>₹<%= transaction.amount.toFixed(2) %>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p class="no-data">No transactions yet</p>
+                <% } %>
+            </div>
+        </div>
+
+        <% if (user.loans.length > 0) { %>
+        <div class="loans-section">
+            <h3>Active Loans</h3>
+            <% user.loans.filter(l => l.status === 'active').forEach(loan => { %>
+                <div class="loan-card">
+                    <p>Amount: ₹<%= loan.amount %></p>
+                    <p>EMI: ₹<%= loan.emiAmount %> / month</p>
+                    <p>Tenure: <%= loan.tenure %> months</p>
+                </div>
+            <% }) %>
+        </div>
+        <% } %>
+
+        <% if (user.fixedDeposits.length > 0) { %>
+        <div class="fd-section">
+            <h3>Fixed Deposits</h3>
+            <% user.fixedDeposits.filter(fd => fd.status === 'active').forEach(fd => { %>
+                <div class="fd-card">
+                    <p>Amount: ₹<%= fd.amount %></p>
+                    <p>Maturity: ₹<%= fd.maturityAmount %></p>
+                    <p>Tenure: <%= fd.tenure %> years</p>
+                </div>
+            <% }) %>
+        </div>
+        <% } %>
+    </div>
+</body>
+</html>

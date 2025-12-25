@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <h2>💬 Customer Support</h2>
+        
+        <div class="support-options">
+            <div class="support-card">
+                <div class="support-icon">📞</div>
+                <h3>Call Us</h3>
+                <p>+91-1800-XXX-XXXX</p>
+                <p class="support-time">24/7 Available</p>
+            </div>
+            
+            <div class="support-card">
+                <div class="support-icon">✉️</div>
+                <h3>Email Support</h3>
+                <p>support@securebank.com</p>
+                <p class="support-time">Reply within 24 hours</p>
+            </div>
+            
+            <div class="support-card">
+                <div class="support-icon">💬</div>
+                <h3>Live Chat</h3>
+                <button class="btn-primary">Start Chat</button>
+                <p class="support-time">Online now</p>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <h3>Frequently Asked Questions</h3>
+            
+            <div class="faq-item">
+                <h4>How do I reset my password?</h4>
+                <p>Go to Settings > Security > Change Password</p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>How long does a transfer take?</h4>
+                <p>Transfers are instant within SecureBank. External transfers may take 1-2 business days.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>What are the interest rates?</h4>
+                <p>Fixed Deposits: 7.5% p.a. | Recurring Deposits: 7% p.a. | Loans: 8.5% p.a.</p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>How do I download my statement?</h4>
+                <p>Go to Transactions > Download Statement > Select date range and format (PDF/Text)</p>
+            </div>
+            
+            <div class="faq-item">
+                <h4>Is my money safe?</h4>
+                <p>Yes! All deposits are insured and we use bank-level encryption for all transactions.</p>
+            </div>
+        </div>
+
+        <div class="contact-form-section">
+            <h3>Raise a Support Ticket</h3>
+            <form class="support-form">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" placeholder="Brief description of your issue" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select required>
+                        <option value="">Select Category</option>
+                        <option value="account">Account Issues</option>
+                        <option value="transaction">Transaction Problem</option>
+                        <option value="card">Card Related</option>
+                        <option value="loan">Loan Enquiry</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea rows="5" placeholder="Describe your issue in detail..." required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Submit Ticket</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

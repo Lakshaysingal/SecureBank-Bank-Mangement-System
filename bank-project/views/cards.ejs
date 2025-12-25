@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cards - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user }) %>
+    
+    <div class="cards-page">
+        <div class="page-header">
+            <h2>💳 My Cards</h2>
+            <button class="btn-primary" onclick="showApplyModal()">Apply for New Card</button>
+        </div>
+
+        <div class="cards-grid">
+            <% if (user.cards && user.cards.length > 0) { %>
+                <% user.cards.forEach(card => { %>
+                    <div class="card-item <%= card.cardType %> <%= !card.isActive ? 'blocked' : '' %>">
+                        <div class="card-type-badge"><%= card.cardType.toUpperCase() %></div>
+                        <div class="card-chip">💳</div>
+                        <div class="card-number">
+                            <%= card.cardNumber.match(/.{1,4}/g).join(' ') %>
+                        </div>
+                        <div class="card-details">
+                            <div class="card-holder">
+                                <small>CARD HOLDER</small>
+                                <div><%= card.cardHolder %></div>
+                            </div>
+                            <div class="card-expiry">
+                                <small>VALID THRU</small>
+                                <div><%= card.expiryDate %></div>
+                            </div>
+                        </div>
+                        <% if (card.cardType === 'credit') { %>
+                            <div class="credit-limit">
+                                <small>Available Credit</small>
+                                <div class="credit-amount">₹<%= card.availableCredit.toFixed(2) %> / ₹<%= card.creditLimit.toFixed(2) %></div>
+                            </div>
+                        <% } %>
+                        <div class="card-status">
+                            <% if (card.isActive) { %>
+                                <span class="status-active">● Active</span>
+                                <form action="/bank/cards/block/<%= card._id %>" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn-danger-small" onclick="return confirm('Are you sure you want to block this card?')">Block Card</button>
+                                </form>
+                            <% } else { %>
+                                <span class="status-blocked">● Blocked</span>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-cards">
+                    <p>You don't have any cards yet</p>
+                    <button class="btn-primary" onclick="showApplyModal()">Apply for Your First Card</button>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Apply Card Modal -->
+    <div id="applyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeApplyModal()">&times;</span>
+            <h3>Apply for New Card</h3>
+            <form action="/bank/cards/apply" method="POST">
+                <div class="form-group">
+                    <label>Card Type</label>
+                    <select name="cardType" id="cardType" required onchange="toggleCreditLimit()">
+                        <option value="debit">Debit Card</option>
+                        <option value="credit">Credit Card</option>
+                    </select>
+                </div>
+                <div class="form-group" id="creditLimitGroup" style="display: none;">
+                    <label>Credit Limit (₹)</label>
+                    <input type="number" name="creditLimit" min="10000" max="500000" step="1000" value="50000">
+                </div>
+                <button type="submit" class="btn-primary full-width">Apply</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/cards.js"></script>
+</body>
+</html>

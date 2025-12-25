@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Payments - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <h2>📱 QR Code Payments</h2>
+        
+        <div class="qr-container">
+            <!-- Receive Money -->
+            <div class="qr-section">
+                <h3>Receive Money</h3>
+                <div class="qr-card">
+                    <% if (hasCustomQR) { %>
+                        <div class="custom-qr-badge">✨ Custom QR</div>
+                    <% } %>
+                    <img src="<%= qrCode %>" alt="QR Code" class="qr-code-image">
+                    <p class="qr-info">Scan this QR code to pay me</p>
+                    <div class="user-qr-details">
+                        <p><strong><%= user.fullName %></strong></p>
+                        <p>UPI: <%= user.accountNumber %>@securebank</p>
+                    </div>
+                    
+                    <div class="qr-actions">
+                        <button class="btn-primary" onclick="downloadQR()">📥 Download QR</button>
+                        <button class="btn-secondary" onclick="showUploadModal()">📤 Upload Custom QR</button>
+                        <% if (hasCustomQR) { %>
+                            <form action="/bank/qr-pay/remove" method="POST" style="display: inline;">
+                                <button type="submit" class="btn-danger-small" onclick="return confirm('Remove custom QR and use default?')">
+                                    🗑️ Remove Custom
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pay Using QR -->
+            <div class="qr-section">
+                <h3>Pay Using QR</h3>
+                <div class="qr-card">
+                    <div class="qr-scanner">
+                        <p>📷 Scan QR Code</p>
+                        <p class="info-text">In a real app, this would open camera</p>
+                    </div>
+                    <p>Or enter QR data manually:</p>
+                    <form action="/bank/qr-pay/scan" method="POST">
+                        <div class="form-group">
+                            <label>QR Data (JSON)</label>
+                            <textarea name="qrData" rows="4" placeholder='{"accountNumber":"ACCxxxx","name":"John Doe"}' required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount (₹)</label>
+                            <input type="number" name="amount" min="1" step="0.01" required>
+                        </div>
+                        <p class="balance-info">Available: ₹<%= user.balance.toFixed(2) %></p>
+                        <button type="submit" class="btn-primary full-width">Pay Now</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload QR Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeUploadModal()">&times;</span>
+            <h3>📤 Upload Custom QR Code</h3>
+            <p class="info-text">Upload your own QR code image (JPEG, JPG, PNG - Max 2MB)</p>
+            
+            <form action="/bank/qr-pay/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="form-group">
+                    <label for="qrImage" class="file-upload-label">
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-icon">📁</div>
+                            <p>Click to select or drag & drop</p>
+                            <p class="upload-hint">PNG, JPG, JPEG (Max 2MB)</p>
+                        </div>
+                    </label>
+                    <input type="file" name="qrImage" id="qrImage" accept="image/png,image/jpeg,image/jpg" required style="display: none;">
+                </div>
+                
+                <div id="previewContainer" style="display: none;">
+                    <img id="preview" style="max-width: 200px; margin: 1rem auto; display: block; border: 2px solid #e5e7eb; border-radius: 10px;">
+                    <p id="fileName" style="text-align: center; color: #666; font-size: 0.9rem;"></p>
+                </div>
+                
+                <button type="submit" class="btn-primary full-width">Upload QR Code</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function downloadQR() {
+            const link = document.createElement('a');
+            link.href = '<%= qrCode %>';
+            link.download = 'my-payment-qr.png';
+            link.click();
+        }
+        
+        function showUploadModal() {
+            document.getElementById('uploadModal').style.display = 'block';
+        }
+        
+        function closeUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+        }
+        
+        // File input handling
+        const fileInput = document.getElementById('qrImage');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewContainer = document.getElementById('previewContainer');
+        const preview = document.getElementById('preview');
+        const fileName = document.getElementById('fileName');
+        
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#667eea';
+            uploadArea.style.background = '#f0f9ff';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '#e5e7eb';
+            uploadArea.style.background = '#f9fafb';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '#e5e7eb';
+            uploadArea.style.background = '#f9fafb';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+        
+        function handleFileSelect(file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert('File size must be less than 2MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                preview.src = e.target.result;
+                fileName.textContent = file.name;
+                previewContainer.style.display = 'block';
+                uploadArea.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('uploadModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+
+    <style>
+        .custom-qr-badge {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        .qr-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .qr-actions button {
+            width: 100%;
+        }
+        
+        .btn-danger-small {
+            padding: 0.6rem 1rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-danger-small:hover {
+            background: #dc2626;
+        }
+        
+        .file-upload-label {
+            cursor: pointer;
+        }
+        
+        .upload-area {
+            border: 2px dashed #e5e7eb;
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: #f9fafb;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f9ff;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-hint {
+            color: #999;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <%- include('partials/admin-navbar') %>
+    
+    <div class="admin-container">
+        <h1>📊 Admin Dashboard</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card admin-stat">
+                <div class="stat-icon" style="background: #3b82f6;">👥</div>
+                <div class="stat-content">
+                    <h3>Total Users</h3>
+                    <p class="stat-number"><%= stats.totalUsers %></p>
+                </div>
+            </div>
+            
+            <div class="stat-card admin-stat">
+                <div class="stat-icon" style="background: #10b981;">💰</div>
+                <div class="stat-content">
+                    <h3>Total Balance</h3>
+                    <p class="stat-number">₹<%= stats.totalBalance.toFixed(2) %></p>
+                </div>
+            </div>
+            
+            <div class="stat-card admin-stat">
+                <div class="stat-icon" style="background: #f59e0b;">📝</div>
+                <div class="stat-content">
+                    <h3>Transactions</h3>
+                    <p class="stat-number"><%= stats.totalTransactions %></p>
+                </div>
+            </div>
+            
+            <div class="stat-card admin-stat">
+                <div class="stat-icon" style="background: #ef4444;">💳</div>
+                <div class="stat-content">
+                    <h3>Active Loans</h3>
+                    <p class="stat-number"><%= stats.activeLoans %></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-users-section">
+            <h2>Recent Users</h2>
+            <div class="admin-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Account Number</th>
+                            <th>Balance</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% recentUsers.forEach(user => { %>
+                            <tr>
+                                <td><%= user.fullName %></td>
+                                <td><%= user.email %></td>
+                                <td><%= user.accountNumber %></td>
+                                <td>₹<%= user.balance.toFixed(2) %></td>
+                                <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+                                <td>
+                                    <a href="/admin/users/<%= user._id %>" class="btn-view">View</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

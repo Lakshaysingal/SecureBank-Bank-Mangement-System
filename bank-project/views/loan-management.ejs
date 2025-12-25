@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Management - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h2>💳 My Loans</h2>
+            <a href="/bank/loan" class="btn-primary">+ Apply for New Loan</a>
+        </div>
+
+        <div class="loans-grid">
+            <% if (user.loans && user.loans.length > 0) { %>
+                <% user.loans.forEach(loan => { %>
+                    <div class="loan-detail-card <%= loan.status %>">
+                        <div class="loan-header">
+                            <h3><%= loan.loanType ? loan.loanType.toUpperCase() : 'PERSONAL' %> Loan</h3>
+                            <span class="status-badge <%= loan.status %>">
+                                <%= loan.status === 'active' ? '🟢 Active' : '✅ Closed' %>
+                            </span>
+                        </div>
+                        
+                        <div class="loan-details">
+                            <div class="detail-row">
+                                <span>Loan Amount:</span>
+                                <strong>₹<%= loan.amount.toFixed(2) %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Interest Rate:</span>
+                                <strong><%= loan.interestRate %>% p.a.</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>EMI Amount:</span>
+                                <strong>₹<%= loan.emiAmount %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Tenure:</span>
+                                <strong><%= loan.tenure %> months</strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>EMIs Paid:</span>
+                                <strong><%= loan.paidEmis || 0 %> / <%= loan.tenure %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Remaining EMIs:</span>
+                                <strong><%= loan.tenure - (loan.paidEmis || 0) %></strong>
+                            </div>
+                            <div class="detail-row">
+                                <span>Start Date:</span>
+                                <strong><%= new Date(loan.startDate).toLocaleDateString() %></strong>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="loan-progress">
+                            <div class="progress-bar">
+                                <div class="progress" style="width: <%= ((loan.paidEmis || 0) / loan.tenure * 100) %>%"></div>
+                            </div>
+                            <p class="progress-text"><%= ((loan.paidEmis || 0) / loan.tenure * 100).toFixed(1) %>% Complete</p>
+                        </div>
+
+                        <% if (loan.status === 'active' && (loan.paidEmis || 0) < loan.tenure) { %>
+                            <form action="/bank/loans/pay-emi/<%= loan._id %>" method="POST">
+                                <button type="submit" class="btn-primary full-width">
+                                    Pay EMI - ₹<%= loan.emiAmount %>
+                                </button>
+                            </form>
+                        <% } %>
+
+                        <!-- Payment History -->
+                        <% if (loan.payments && loan.payments.length > 0) { %>
+                            <div class="payment-history">
+                                <h4>Recent Payments</h4>
+                                <% loan.payments.slice(-3).reverse().forEach(payment => { %>
+                                    <div class="payment-item">
+                                        <span>₹<%= payment.amount.toFixed(2) %></span>
+                                        <span><%= new Date(payment.date).toLocaleDateString() %></span>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="no-data">
+                    <p>💳 No active loans</p>
+                    <a href="/bank/loan" class="btn-primary">Apply for a Loan</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheduled Payments - SecureBank</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('partials/navbar', { user: user }) %>
+    
+    <div class="dashboard-container">
+        <div class="page-header">
+            <h2>⏰ Scheduled Payments</h2>
+            <button class="btn-primary">+ Schedule New Payment</button>
+        </div>
+
+        <div class="no-data">
+            <p>📅 No scheduled payments yet</p>
+            <p class="info-text">Set up recurring payments for bills, EMIs, and more</p>
+            <button class="btn-primary">Schedule Your First Payment</button>
+        </div>
+    </div>
+</body>
+</html>
